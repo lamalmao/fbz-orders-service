@@ -12,43 +12,25 @@ const getOrdersController = async (req, res) => {
   try {
     const { month, year, limit } = OrdersParams.parse(req.body.params);
 
+    const from = new Date(year, month - 1, 1);
+    const to = new Date(year, month, 1);
+
+    const now = Date.now();
+
     const data = await orders.find(
       {
-        $expr: {
-          $and: [
-            {
-              $eq: [
-                {
-                  $month: {
-                    $dateFromString: {
-                      dateString: {
-                        $toString: '$date'
-                      }
-                    }
-                  }
-                },
-                month
-              ]
-            },
-            {
-              $eq: [
-                {
-                  $year: {
-                    $dateFromString: {
-                      dateString: {
-                        $toString: '$date'
-                      }
-                    }
-                  }
-                },
-                year
-              ]
-            },
-            {
-              $eq: ['$paid', true]
+        $and: [
+          {
+            date: {
+              $gt: from
             }
-          ]
-        }
+          },
+          {
+            date: {
+              $lt: to
+            }
+          }
+        ]
       },
       {
         orderID: 1,
@@ -94,6 +76,7 @@ const getOrdersController = async (req, res) => {
 
       result.push({
         ...data[i]._doc,
+        key: data[i].status === 'paid' ? data[i].key : undefined,
         managerName
       });
     }
