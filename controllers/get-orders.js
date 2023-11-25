@@ -29,7 +29,8 @@ const getOrdersController = async (req, res) => {
             date: {
               $lt: to
             }
-          }
+          },
+          paid: true
         ]
       },
       {
