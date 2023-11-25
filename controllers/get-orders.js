@@ -30,7 +30,9 @@ const getOrdersController = async (req, res) => {
               $lt: to
             }
           },
-          paid: true
+          {
+            paid: true
+          }
         ]
       },
       {
