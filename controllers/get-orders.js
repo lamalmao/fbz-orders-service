@@ -79,7 +79,7 @@ const getOrdersController = async (req, res) => {
 
       result.push({
         ...data[i]._doc,
-        key: data[i].status === 'paid' ? data[i].key : '',
+        key: data[i].status === 'done' ? data[i].key : '',
         managerName
       });
     }
