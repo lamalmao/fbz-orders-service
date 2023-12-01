@@ -12,10 +12,12 @@ const getOrdersController = async (req, res) => {
   try {
     const { month, year, limit } = OrdersParams.parse(req.body.params);
 
-    const from = new Date(year, month - 1, 1);
+    const from = new Date(
+      month === 0 ? year - 1 : year,
+      month === 0 ? 11 : month - 1,
+      1
+    );
     const to = new Date(year, month, 1);
-
-    const now = Date.now();
 
     const data = await orders.find(
       {
@@ -46,7 +48,8 @@ const getOrdersController = async (req, res) => {
         refundData: 1,
         status: 1,
         platform: 1,
-        date: 1
+        date: 1,
+        cardNumber: 1
       },
       {
         limit,
@@ -77,9 +80,16 @@ const getOrdersController = async (req, res) => {
         managers.set(id, managerName);
       }
 
+      let key = '';
+      if (data[i].cardNumber) {
+        key = '*' + data[i].cardNumber.slice(-4);
+      } else if (data[i].status === 'done' && data[i].key) {
+        key = data[i].key;
+      }
+
       result.push({
         ...data[i]._doc,
-        key: data[i].status === 'done' ? data[i].key : '',
+        key,
         managerName
       });
     }
